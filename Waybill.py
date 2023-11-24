@@ -11,11 +11,11 @@ class InvoiceApp(QDialog):
 
         # Ваши данные о товарах, их ценах, измерениях и адресах магазинов
         self.product_prices = {
-            'Молоко': {'price': 1.5, 'measurement': 'л'},
-            'Хлеб': {'price': 0.8, 'measurement': 'шт'},
-            'Яйца': {'price': 2.0, 'measurement': 'шт'},
-            'Картошка': {'price': 1.2, 'measurement': 'кг'},
-            'Масло': {'price': 2.5, 'measurement': 'шт'},
+            'Молоко': {'price': 50, 'measurement': 'л'},
+            'Хлеб': {'price': 25, 'measurement': 'шт'},
+            'Яйца': {'price': 90, 'measurement': 'шт'},
+            'Картошка': {'price': 30, 'measurement': 'кг'},
+            'Масло': {'price': 100, 'measurement': 'шт'},
         }
 
         self.store_addresses = {
@@ -139,9 +139,10 @@ class InvoiceApp(QDialog):
 
             total_label.setText(str(total))
             items_info.append(f"{product_name} - {quantity} {product_info['measurement']} - {total:.2f}")
-            total += quantity * price
 
-        self.total_edit.setPlainText('\n'.join(items_info))
+        total = sum(
+            float(self.products_table.cellWidget(row, 4).text()) for row in range(self.products_table.rowCount()))
+        self.total_edit.setPlainText(f"Общая стоимость закупки: {total:.2f}\n" + '\n'.join(items_info))
 
     def save_invoice(self):
         # Здесь вы можете реализовать сохранение накладной в файл или вывод в отдельное окно
