@@ -5,6 +5,11 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QComboBox, QVBoxLayou
 import traceback
 from datetime import datetime
 import pandas as pd
+import os
+from PIL import Image
+from openpyxl.drawing.image import Image as ExcelImage
+from openpyxl.reader.excel import load_workbook
+
 
 class LoginDialog(QDialog):
     def __init__(self):
@@ -98,6 +103,31 @@ class EditInvoiceApp(QDialog):
             traceback.print_exc()
             QMessageBox.warning(self, 'Ошибка', f'Не удалось сохранить изменения: {str(e)}', QMessageBox.Ok)
 
+    def add_stamp_to_excel(self, excel_file_path, stamp_image_path):
+        # Открываем изображение с печатью
+        stamp_img = Image.open(stamp_image_path)
+
+        # Сохраняем изображение во временный файл
+        temp_stamp_path = "temp_stamp.png"
+        stamp_img.save(temp_stamp_path)
+
+        try:
+            # Открываем существующий файл Excel
+            workbook = load_workbook(excel_file_path)
+            sheet = workbook.active
+
+            # Создаем объект ExcelImage и добавляем его в лист
+            excel_image = ExcelImage(temp_stamp_path)
+            sheet.add_image(excel_image, 'I1')
+
+            # Сохраняем изменения
+            workbook.save(excel_file_path)
+        except Exception as e:
+            print(f"Ошибка при добавлении печати: {e}")
+        finally:
+            # Удаляем временный файл
+            os.remove(temp_stamp_path)
+
     def convert_to_excel(self):
         try:
             # Развертываем структуру JSON в DataFrame
@@ -133,6 +163,8 @@ class EditInvoiceApp(QDialog):
                     row, col = df.shape
                     worksheet.cell(row=row + 2, column=col + 1, value='Общая стоимость закупки')
                     worksheet.cell(row=row + 3, column=col + 1, value=total_purchase_cost)
+
+                self.add_stamp_to_excel(excel_file, "stamp/SHablon-IP-02.png")
 
                 QMessageBox.information(self, 'Экспорт завершен', 'Данные успешно экспортированы в Excel',
                                         QMessageBox.Ok)
@@ -370,6 +402,8 @@ class InvoiceApp(QDialog):
             traceback.print_exc()
             QMessageBox.warning(self, 'Ошибка', f'Не удалось сохранить накладную: {str(e)}', QMessageBox.Ok)
 
+    
+
     def closeEvent(self, event):
         """Обработчик события закрытия окна."""
         reply = QMessageBox.question(self, 'Выход', 'Действительно ли вы хотите выйти?',
@@ -379,6 +413,8 @@ class InvoiceApp(QDialog):
             event.accept()
         else:
             event.ignore()
+
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
