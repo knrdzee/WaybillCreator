@@ -402,7 +402,25 @@ class InvoiceApp(QDialog):
             traceback.print_exc()
             QMessageBox.warning(self, 'Ошибка', f'Не удалось сохранить накладную: {str(e)}', QMessageBox.Ok)
 
-    
+    def load_invoice(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.ReadOnly
+        file_name, _ = QFileDialog.getOpenFileName(self, "Выберите JSON-файл накладной", "",
+                                                   "JSON Files (*.json);;All Files (*)", options=options)
+
+        if file_name:
+            try:
+                with open(file_name, 'r', encoding='utf-8') as json_file:
+                    loaded_invoice_data = json.load(json_file)
+
+                # Открываем окно для редактирования данных
+                edit_app = EditInvoiceApp(loaded_invoice_data, file_name)
+                edit_app.exec_()
+
+            except Exception as e:
+                print(f"Ошибка при загрузке накладной: {e}")
+                traceback.print_exc()
+                QMessageBox.warning(self, 'Ошибка', f'Не удалось загрузить накладную: {str(e)}', QMessageBox.Ok)
 
     def closeEvent(self, event):
         """Обработчик события закрытия окна."""
