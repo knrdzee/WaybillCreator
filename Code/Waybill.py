@@ -10,7 +10,6 @@ from PIL import Image
 from openpyxl.drawing.image import Image as ExcelImage
 from openpyxl.reader.excel import load_workbook
 
-
 class LoginDialog(QDialog):
     def __init__(self):
         super(LoginDialog, self).__init__()
@@ -164,7 +163,7 @@ class EditInvoiceApp(QDialog):
                     worksheet.cell(row=row + 2, column=col + 1, value='Общая стоимость закупки')
                     worksheet.cell(row=row + 3, column=col + 1, value=total_purchase_cost)
 
-                self.add_stamp_to_excel(excel_file, "stamp/SHablon-IP-02.png")
+                self.add_stamp_to_excel(excel_file, "SHablon-IP-02.png")
 
                 QMessageBox.information(self, 'Экспорт завершен', 'Данные успешно экспортированы в Excel',
                                         QMessageBox.Ok)
